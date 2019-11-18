@@ -38,17 +38,17 @@ public final class FlutterQqPlugin implements FlutterPlugin, ActivityAware, Meth
 
     public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
         this.mMethodChannel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "flutter_qq");
-        MethodChannel var10000 = this.mMethodChannel;
-        if (var10000 != null) {
-            var10000.setMethodCallHandler((MethodCallHandler)this);
+        MethodChannel methodChannel = this.mMethodChannel;
+        if (methodChannel != null) {
+            methodChannel.setMethodCallHandler((MethodCallHandler)this);
         }
 
     }
 
     public void onDetachedFromEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
-        MethodChannel var10000 = this.mMethodChannel;
-        if (var10000 != null) {
-            var10000.setMethodCallHandler((MethodCallHandler)null);
+        MethodChannel methodChannel = this.mMethodChannel;
+        if (methodChannel != null) {
+            methodChannel.setMethodCallHandler((MethodCallHandler)null);
         }
 
         this.mMethodChannel = (MethodChannel)null;
@@ -56,10 +56,16 @@ public final class FlutterQqPlugin implements FlutterPlugin, ActivityAware, Meth
 
     public void onAttachedToActivity(@NonNull ActivityPluginBinding activityPluginBinding) {
         this.mActivityBinder = activityPluginBinding;
+        if (this.mActivityBinder != null) {
+            this.mActivityBinder.addActivityResultListener(listener);
+        }
     }
 
     public void onDetachedFromActivityForConfigChanges() {
-        this.mActivityBinder = (ActivityPluginBinding)null;
+        if (this.mActivityBinder != null) {
+            this.mActivityBinder.removeActivityResultListener(listener);
+        }
+        this.mActivityBinder = null;
     }
 
     public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding activityPluginBinding) {
@@ -70,45 +76,41 @@ public final class FlutterQqPlugin implements FlutterPlugin, ActivityAware, Meth
         this.onDetachedFromActivityForConfigChanges();
     }
 
-    public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
-        FlutterQqPlugin.OneListener listener = new FlutterQqPlugin.OneListener();
-        ActivityPluginBinding var10000 = this.mActivityBinder;
-        if (var10000 != null) {
-            var10000.addActivityResultListener((ActivityResultListener)listener);
-        }
+    FlutterQqPlugin.OneListener listener = new FlutterQqPlugin.OneListener();
 
-        String var5 = call.method;
-        if (var5 != null) {
-            String var4 = var5;
-            switch(var4.hashCode()) {
+    public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
+        String method1 = call.method;
+        if (method1 != null) {
+            String method = method1;
+            switch(method.hashCode()) {
                 case -1869931517:
-                    if (var4.equals("registerQQ")) {
+                    if (method.equals("registerQQ")) {
                         this.registerQQ(call, result);
                     }
                     break;
                 case -1585587965:
-                    if (var4.equals("shareToQzone")) {
+                    if (method.equals("shareToQzone")) {
                         this.isLogin = false;
                         listener.setResult$flutter_qq_debug(result);
                         this.doShareToQzone(call, listener);
                     }
                     break;
                 case -1582030246:
-                    if (var4.equals("shareToQQ")) {
+                    if (method.equals("shareToQQ")) {
                         this.isLogin = false;
                         listener.setResult$flutter_qq_debug(result);
                         this.doShareToQQ(call, listener);
                     }
                     break;
                 case 103149417:
-                    if (var4.equals("login")) {
+                    if (method.equals("login")) {
                         this.isLogin = true;
                         listener.setResult$flutter_qq_debug(result);
                         this.login(call, listener);
                     }
                     break;
                 case 693216720:
-                    if (var4.equals("isQQInstalled")) {
+                    if (method.equals("isQQInstalled")) {
                         this.isQQInstalled(call, result);
                     }
             }
@@ -118,11 +120,11 @@ public final class FlutterQqPlugin implements FlutterPlugin, ActivityAware, Meth
 
     private final void registerQQ(MethodCall call, Result result) {
         String mAppid = (String)call.argument("appId");
-        ActivityPluginBinding var10001 = this.mActivityBinder;
-        if (var10001 != null) {
-            Activity var4 = var10001.getActivity();
-            if (var4 != null) {
-                mTencent = Tencent.createInstance(mAppid, (Context)var4);
+        ActivityPluginBinding activityPluginBinding = this.mActivityBinder;
+        if (activityPluginBinding != null) {
+            Activity activity = activityPluginBinding.getActivity();
+            if (activity != null) {
+                mTencent = Tencent.createInstance(mAppid, (Context)activity);
                 result.success(true);
                 return;
             }
@@ -131,115 +133,115 @@ public final class FlutterQqPlugin implements FlutterPlugin, ActivityAware, Meth
     }
 
     private final void isQQInstalled(MethodCall call, Result result) {
-        Tencent var10001 = mTencent;
-        Boolean var3;
-        if (var10001 != null) {
-            ActivityPluginBinding var10002 = this.mActivityBinder;
-            if (var10002 == null) {
+        Tencent tencent = mTencent;
+        Boolean isInstalled;
+        if (tencent != null) {
+            ActivityPluginBinding activityPluginBinding = this.mActivityBinder;
+            if (activityPluginBinding == null) {
                 return;
             }
 
-            Activity var4 = var10002.getActivity();
-            if (var4 == null) {
+            Activity activity = activityPluginBinding.getActivity();
+            if (activity == null) {
                 return;
             }
 
-            var3 = var10001.isQQInstalled((Context)var4);
+            isInstalled = tencent.isQQInstalled((Context)activity);
         } else {
-            var3 = null;
+            isInstalled = null;
         }
 
-        result.success(var3);
+        result.success(isInstalled);
     }
 
     private final void login(MethodCall call, FlutterQqPlugin.OneListener listener) {
         String scopes = (String)call.argument("scopes");
-        Tencent var10000 = mTencent;
-        if (var10000 != null) {
-            ActivityPluginBinding var10001 = this.mActivityBinder;
-            if (var10001 == null) {
+        Tencent tencent = mTencent;
+        if (tencent != null) {
+            ActivityPluginBinding activityPluginBinding = this.mActivityBinder;
+            if (activityPluginBinding == null) {
                 return;
             }
 
-            Activity var4 = var10001.getActivity();
-            if (var4 == null) {
+            Activity activity = activityPluginBinding.getActivity();
+            if (activity == null) {
                 return;
             }
 
-            String var10002 = scopes;
+            String user_info = scopes;
             if (scopes == null) {
-                var10002 = "get_simple_userinfo";
+                user_info = "get_simple_userinfo";
             }
 
-            var10000.login(var4, var10002, (IUiListener)listener);
+            tencent.login(activity, user_info, (IUiListener)listener);
         }
 
     }
 
     private final void doShareToQQ(MethodCall call, final FlutterQqPlugin.OneListener listener) {
-        final Bundle params;
+        final Bundle bundle;
         Integer shareType;
-        byte var5;
+        byte type;
         label39: {
-            params = new Bundle();
+            bundle = new Bundle();
             shareType = (Integer)call.argument("shareType");
             Log.i("FlutterQqPlugin", "arguments:" + call.arguments);
-            var5 = 5;
+            type = 5;
             if (shareType != null) {
-                if (shareType == var5) {
+                if (shareType == type) {
                     break label39;
                 }
             }
 
-            params.putString("title", (String)call.argument("title"));
-            params.putString("targetUrl", (String)call.argument("targetUrl"));
-            params.putString("summary", (String)call.argument("summary"));
+            bundle.putString("title", (String)call.argument("title"));
+            bundle.putString("targetUrl", (String)call.argument("targetUrl"));
+            bundle.putString("summary", (String)call.argument("summary"));
         }
 
         label34: {
-            var5 = 5;
+            type = 5;
             if (shareType != null) {
-                if (shareType == var5) {
-                    params.putString("imageLocalUrl", (String)call.argument("imageLocalUrl"));
+                if (shareType == type) {
+                    bundle.putString("imageLocalUrl", (String)call.argument("imageLocalUrl"));
                     break label34;
                 }
             }
 
-            params.putString("imageUrl", (String)call.argument("imageUrl"));
+            bundle.putString("imageUrl", (String)call.argument("imageUrl"));
         }
 
-        params.putString("appName", (String)call.argument("appName"));
-        params.putInt("req_type", shareType != null ? shareType : 0);
-        Integer var10002 = (Integer)call.argument("qzoneFlag");
-        if (var10002 == null) {
-            var10002 = 0;
+        bundle.putString("appName", (String)call.argument("appName"));
+        bundle.putInt("req_type", shareType != null ? shareType : 0);
+        Integer qzoneFlag = (Integer)call.argument("qzoneFlag");
+        if (qzoneFlag == null) {
+            qzoneFlag = 0;
         }
 
-        params.putInt("cflag", var10002);
-        var5 = 2;
+        bundle.putInt("cflag", qzoneFlag);
+        type = 2;
         if (shareType != null) {
-            if (shareType == var5) {
-                params.putString("audio_url", (String)call.argument("audioUrl"));
+            if (shareType == type) {
+                bundle.putString("audio_url", (String)call.argument("audioUrl"));
             }
         }
 
-        params.putString("share_to_qq_ark_info", (String)call.argument("ark"));
-        Log.i("FlutterQqPlugin", "params:" + params);
+        bundle.putString("share_to_qq_ark_info", (String)call.argument("ark"));
+        Log.i("FlutterQqPlugin", "params:" + bundle);
         (new Handler(Looper.getMainLooper())).post((Runnable)(new Runnable() {
             public final void run() {
-                Tencent var10000 = FlutterQqPlugin.mTencent;
-                if (var10000 != null) {
-                    ActivityPluginBinding var10001 = FlutterQqPlugin.this.mActivityBinder;
-                    if (var10001 == null) {
+                Tencent tencent = FlutterQqPlugin.mTencent;
+                if (tencent != null) {
+                    ActivityPluginBinding activityPluginBinding = FlutterQqPlugin.this.mActivityBinder;
+                    if (activityPluginBinding == null) {
                         return;
                     }
 
-                    Activity var1 = var10001.getActivity();
-                    if (var1 == null) {
+                    Activity activity = activityPluginBinding.getActivity();
+                    if (activity == null) {
                         return;
                     }
 
-                    var10000.shareToQQ(var1, params, (IUiListener)listener);
+                    tencent.shareToQQ(activity, bundle, (IUiListener)listener);
                 }
 
             }
@@ -247,42 +249,42 @@ public final class FlutterQqPlugin implements FlutterPlugin, ActivityAware, Meth
     }
 
     private final void doShareToQzone(MethodCall call, final FlutterQqPlugin.OneListener listener) {
-        final Bundle params = new Bundle();
+        final Bundle bundle = new Bundle();
         Integer shareType = (Integer)call.argument("shareType");
         Log.i("FlutterQqPlugin", "arguments:" + call.arguments);
-        params.putInt("req_type", shareType != null ? shareType : 0);
-        params.putString("title", (String)call.argument("title"));
-        params.putString("summary", (String)call.argument("summary"));
-        params.putString("targetUrl", (String)call.argument("targetUrl"));
+        bundle.putInt("req_type", shareType != null ? shareType : 0);
+        bundle.putString("title", (String)call.argument("title"));
+        bundle.putString("summary", (String)call.argument("summary"));
+        bundle.putString("targetUrl", (String)call.argument("targetUrl"));
         ArrayList list = new ArrayList();
-        String var10001 = (String)call.argument("imageUrl");
-        if (var10001 != null) {
-            list.add(var10001);
-            params.putStringArrayList("imageUrl", list);
-            params.putString("videoPath", (String)call.argument("videoPath"));
+        String imageUrl = (String)call.argument("imageUrl");
+        if (imageUrl != null) {
+            list.add(imageUrl);
+            bundle.putStringArrayList("imageUrl", list);
+            bundle.putString("videoPath", (String)call.argument("videoPath"));
             Bundle bundle2 = new Bundle();
             bundle2.putString("hulian_extra_scene", (String)call.argument("scene"));
             bundle2.putString("hulian_call_back", (String)call.argument("hulian_call_back"));
-            params.putBundle("extMap", bundle2);
-            Log.i("FlutterQqPlugin", "params:" + params);
+            bundle.putBundle("extMap", bundle2);
+            Log.i("FlutterQqPlugin", "params:" + bundle);
             byte var7 = 1;
             if (shareType != null) {
                 if (shareType == var7) {
                     (new Handler(Looper.getMainLooper())).post((Runnable)(new Runnable() {
                         public final void run() {
-                            Tencent var10000 = FlutterQqPlugin.mTencent;
-                            if (var10000 != null) {
-                                ActivityPluginBinding var10001 = FlutterQqPlugin.this.mActivityBinder;
-                                if (var10001 == null) {
+                            Tencent tencent = FlutterQqPlugin.mTencent;
+                            if (tencent != null) {
+                                ActivityPluginBinding activityPluginBinding = FlutterQqPlugin.this.mActivityBinder;
+                                if (activityPluginBinding == null) {
                                     return;
                                 }
 
-                                Activity var1 = var10001.getActivity();
+                                Activity var1 = activityPluginBinding.getActivity();
                                 if (var1 == null) {
                                     return;
                                 }
 
-                                var10000.shareToQzone(var1, params, (IUiListener)listener);
+                                tencent.shareToQzone(var1, bundle, (IUiListener)listener);
                             }
 
                         }
@@ -293,19 +295,19 @@ public final class FlutterQqPlugin implements FlutterPlugin, ActivityAware, Meth
 
             (new Handler(Looper.getMainLooper())).post((Runnable)(new Runnable() {
                 public final void run() {
-                    Tencent var10000 = FlutterQqPlugin.mTencent;
-                    if (var10000 != null) {
-                        ActivityPluginBinding var10001 = FlutterQqPlugin.this.mActivityBinder;
-                        if (var10001 == null) {
+                    Tencent tencent = FlutterQqPlugin.mTencent;
+                    if (tencent != null) {
+                        ActivityPluginBinding activityPluginBinding = FlutterQqPlugin.this.mActivityBinder;
+                        if (activityPluginBinding == null) {
                             return;
                         }
 
-                        Activity var1 = var10001.getActivity();
-                        if (var1 == null) {
+                        Activity activity = activityPluginBinding.getActivity();
+                        if (activity == null) {
                             return;
                         }
 
-                        var10000.publishToQzone(var1, params, (IUiListener)listener);
+                        tencent.publishToQzone(activity, bundle, (IUiListener)listener);
                     }
 
                 }
@@ -313,20 +315,6 @@ public final class FlutterQqPlugin implements FlutterPlugin, ActivityAware, Meth
         }
     }
 
-    // $FF: synthetic method
-    public static final void access$setLogin$p(FlutterQqPlugin $this, boolean var1) {
-        $this.isLogin = var1;
-    }
-
-    // $FF: synthetic method
-    public static final void access$setMTencent$cp(Tencent var0) {
-        mTencent = var0;
-    }
-
-    // $FF: synthetic method
-    public static final void access$setMActivityBinder$p(FlutterQqPlugin $this, ActivityPluginBinding var1) {
-        $this.mActivityBinder = var1;
-    }
 
     private final class OneListener implements IUiListener, ActivityResultListener {
         private Result result;
@@ -337,70 +325,71 @@ public final class FlutterQqPlugin implements FlutterPlugin, ActivityAware, Meth
 
         public void onComplete(@Nullable Object response) {
             Log.i("FlutterQqPlugin", String.valueOf(response));
-            HashMap re = new HashMap();
-            Result var7;
+
+            HashMap hashMap = new HashMap();
+            Result result;
             if (!FlutterQqPlugin.this.isLogin) {
-                ((Map)re).put("Code", 0);
-                ((Map)re).put("Message", String.valueOf(response));
-                var7 = this.result;
-                if (var7 != null) {
-                    var7.success(re);
+                ((Map)hashMap).put("Code", 0);
+                ((Map)hashMap).put("Message", String.valueOf(response));
+                result = this.result;
+                if (result != null) {
+                    result.success(hashMap);
                 }
 
             } else if (response == null) {
-                ((Map)re).put("Code", 1);
-                ((Map)re).put("Message", "response is empty");
-                var7 = this.result;
-                if (var7 != null) {
-                    var7.success(re);
+                ((Map)hashMap).put("Code", 1);
+                ((Map)hashMap).put("Message", "response is empty");
+                result = this.result;
+                if (result != null) {
+                    result.success(hashMap);
                 }
 
             } else {
-                Object var10000 = response;
+                Object response1 = response;
                 if (!(response instanceof JSONObject)) {
-                    var10000 = null;
+                    response1 = null;
                 }
 
-                JSONObject jsonResponse = (JSONObject)var10000;
+                JSONObject jsonResponse = (JSONObject)response1;
                 if (jsonResponse != null && jsonResponse.length() != 0) {
                     HashMap resp = new HashMap();
 
-                    String var10002;
-                    Map var8;
+                    String string;
+                    Map map;
                     try {
                         Log.i("FlutterQqPlugin", resp.toString());
-                        var8 = (Map)resp;
-                        var10002 = jsonResponse.getString("openid");
-                        var8.put("openid", var10002);
-                        var8 = (Map)resp;
-                        var10002 = jsonResponse.getString("access_token");
-                        var8.put("accessToken", var10002);
+                        map = (Map)resp;
+                        string = jsonResponse.getString("openid");
+                        map.put("openid", string);
+                        map = (Map)resp;
+                        string = jsonResponse.getString("access_token");
+                        map.put("accessToken", string);
                         ((Map)resp).put("expiresAt", jsonResponse.getLong("expires_time"));
-                        ((Map)re).put("Code", 0);
-                        ((Map)re).put("Message", "ok");
-                        ((Map)re).put("Response", resp);
-                        var7 = this.result;
-                        if (var7 != null) {
-                            var7.success(re);
+                        ((Map)hashMap).put("Code", 0);
+                        ((Map)hashMap).put("Message", "ok");
+                        ((Map)hashMap).put("Response", resp);
+                        result = this.result;
+                        if (result != null) {
+                            result.success(hashMap);
                         }
 
-                    } catch (Exception var6) {
-                        ((Map)re).put("Code", 1);
-                        var8 = (Map)re;
-                        var10002 = var6.getLocalizedMessage();
-                        var8.put("Message", var10002);
-                        var7 = this.result;
-                        if (var7 != null) {
-                            var7.success(re);
+                    } catch (Exception e) {
+                        ((Map)hashMap).put("Code", 1);
+                        map = (Map)hashMap;
+                        string = e.getLocalizedMessage();
+                        map.put("Message", string);
+                        result = this.result;
+                        if (result != null) {
+                            result.success(hashMap);
                         }
 
                     }
                 } else {
-                    ((Map)re).put("Code", 1);
-                    ((Map)re).put("Message", "response is empty");
-                    var7 = this.result;
-                    if (var7 != null) {
-                        var7.success(re);
+                    ((Map)hashMap).put("Code", 1);
+                    ((Map)hashMap).put("Message", "response is empty");
+                    result = this.result;
+                    if (result != null) {
+                        result.success(hashMap);
                     }
 
                 }
@@ -409,24 +398,24 @@ public final class FlutterQqPlugin implements FlutterPlugin, ActivityAware, Meth
 
         public void onError(@Nullable UiError uiError) {
             Log.w("FlutterQqPlugin", "errorCode:" + (uiError != null ? uiError.errorCode : null) + ";errorMessage:" + (uiError != null ? uiError.errorMessage : null));
-            HashMap re = new HashMap();
-            ((Map)re).put("Code", 1);
-            ((Map)re).put("Message", "errorCode:" + (uiError != null ? uiError.errorCode : null) + ";errorMessage:" + (uiError != null ? uiError.errorMessage : null));
-            Result var10000 = this.result;
-            if (var10000 != null) {
-                var10000.success(re);
+            HashMap hashMap = new HashMap();
+            ((Map)hashMap).put("Code", 1);
+            ((Map)hashMap).put("Message", "errorCode:" + (uiError != null ? uiError.errorCode : null) + ";errorMessage:" + (uiError != null ? uiError.errorMessage : null));
+            Result result = this.result;
+            if (result != null) {
+                result.success(hashMap);
             }
 
         }
 
         public void onCancel() {
             Log.w("FlutterQqPlugin", "error:cancel");
-            HashMap re = new HashMap();
-            ((Map)re).put("Code", 2);
-            ((Map)re).put("Message", "cancel");
-            Result var10000 = this.result;
-            if (var10000 != null) {
-                var10000.success(re);
+            HashMap hashMap = new HashMap();
+            ((Map)hashMap).put("Code", 2);
+            ((Map)hashMap).put("Message", "cancel");
+            Result result = this.result;
+            if (result != null) {
+                result.success(hashMap);
             }
 
         }
