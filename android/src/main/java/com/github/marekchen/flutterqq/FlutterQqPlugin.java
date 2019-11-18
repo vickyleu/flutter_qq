@@ -91,21 +91,21 @@ public final class FlutterQqPlugin implements FlutterPlugin, ActivityAware, Meth
                 case -1585587965:
                     if (method.equals("shareToQzone")) {
                         this.isLogin = false;
-                        listener.setResult$flutter_qq_debug(result);
+                        listener.setResult(result);
                         this.doShareToQzone(call, listener);
                     }
                     break;
                 case -1582030246:
                     if (method.equals("shareToQQ")) {
                         this.isLogin = false;
-                        listener.setResult$flutter_qq_debug(result);
+                        listener.setResult(result);
                         this.doShareToQQ(call, listener);
                     }
                     break;
                 case 103149417:
                     if (method.equals("login")) {
                         this.isLogin = true;
-                        listener.setResult$flutter_qq_debug(result);
+                        listener.setResult(result);
                         this.login(call, listener);
                     }
                     break;
@@ -319,7 +319,7 @@ public final class FlutterQqPlugin implements FlutterPlugin, ActivityAware, Meth
     private final class OneListener implements IUiListener, ActivityResultListener {
         private Result result;
 
-        public final void setResult$flutter_qq_debug(@NonNull Result result) {
+        public final void setResult(@NonNull Result result) {
             this.result = result;
         }
 
