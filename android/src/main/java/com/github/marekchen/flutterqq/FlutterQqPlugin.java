@@ -395,7 +395,7 @@ public final class FlutterQqPlugin implements FlutterPlugin, ActivityAware, Meth
                             if (result != null) {
                                 result.success(hashMap);
                             }
-                        }catch (Exception e){}
+                        }catch (Exception e2){}
 
 
                     }
