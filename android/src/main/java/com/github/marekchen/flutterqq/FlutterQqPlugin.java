@@ -125,7 +125,11 @@ public final class FlutterQqPlugin implements FlutterPlugin, ActivityAware, Meth
             Activity activity = activityPluginBinding.getActivity();
             if (activity != null) {
                 mTencent = Tencent.createInstance(mAppid, (Context)activity);
-                result.success(true);
+                try {
+                    if (result != null) {
+                        result.success(true);
+                    }
+                }catch (Exception e){}
                 return;
             }
         }
@@ -150,8 +154,12 @@ public final class FlutterQqPlugin implements FlutterPlugin, ActivityAware, Meth
         } else {
             isInstalled = null;
         }
+        try {
+            if (result != null) {
+                result.success(isInstalled);
+            }
+        }catch (Exception e){}
 
-        result.success(isInstalled);
     }
 
     private final void login(MethodCall call, FlutterQqPlugin.OneListener listener) {
@@ -332,17 +340,21 @@ public final class FlutterQqPlugin implements FlutterPlugin, ActivityAware, Meth
                 ((Map)hashMap).put("Code", 0);
                 ((Map)hashMap).put("Message", String.valueOf(response));
                 result = this.result;
-                if (result != null) {
-                    result.success(hashMap);
-                }
+                try {
+                    if (result != null) {
+                        result.success(hashMap);
+                    }
+                }catch (Exception e){}
 
             } else if (response == null) {
                 ((Map)hashMap).put("Code", 1);
                 ((Map)hashMap).put("Message", "response is empty");
                 result = this.result;
-                if (result != null) {
-                    result.success(hashMap);
-                }
+                try {
+                    if (result != null) {
+                        result.success(hashMap);
+                    }
+                }catch (Exception e){}
 
             } else {
                 Object response1 = response;
@@ -379,18 +391,23 @@ public final class FlutterQqPlugin implements FlutterPlugin, ActivityAware, Meth
                         string = e.getLocalizedMessage();
                         map.put("Message", string);
                         result = this.result;
-                        if (result != null) {
-                            result.success(hashMap);
-                        }
+                        try {
+                            if (result != null) {
+                                result.success(hashMap);
+                            }
+                        }catch (Exception e){}
+
 
                     }
                 } else {
                     ((Map)hashMap).put("Code", 1);
                     ((Map)hashMap).put("Message", "response is empty");
                     result = this.result;
-                    if (result != null) {
-                        result.success(hashMap);
-                    }
+                    try {
+                        if (result != null) {
+                            result.success(hashMap);
+                        }
+                    }catch (Exception e){}
 
                 }
             }
@@ -402,9 +419,11 @@ public final class FlutterQqPlugin implements FlutterPlugin, ActivityAware, Meth
             ((Map)hashMap).put("Code", 1);
             ((Map)hashMap).put("Message", "errorCode:" + (uiError != null ? uiError.errorCode : null) + ";errorMessage:" + (uiError != null ? uiError.errorMessage : null));
             Result result = this.result;
-            if (result != null) {
-                result.success(hashMap);
-            }
+            try {
+                if (result != null) {
+                    result.success(hashMap);
+                }
+            }catch (Exception e){}
 
         }
 
@@ -414,9 +433,11 @@ public final class FlutterQqPlugin implements FlutterPlugin, ActivityAware, Meth
             ((Map)hashMap).put("Code", 2);
             ((Map)hashMap).put("Message", "cancel");
             Result result = this.result;
-            if (result != null) {
-                result.success(hashMap);
-            }
+            try {
+                if (result != null) {
+                    result.success(hashMap);
+                }
+            }catch (Exception e){}
 
         }
 
